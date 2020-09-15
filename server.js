@@ -17,8 +17,14 @@ function handleGetMovies(req, res) {
 }
 
 app.use(function validateBearerToken(req, res, next) {
+    const bearerToken = req.get('Authorization').split(' ')[1]
+    const apiToken = process.env.API_TOKEN
+
     console.log('validate bearer token middleware')
-    debugger
+    
+    if (bearerToken !== apiToken) {
+        return res.status(401).json({ error: 'Unauthorized request'})
+    }
     //move to next middleware
     next()
 })
