@@ -16,13 +16,42 @@ function handleGetMovies(req, res) {
     }
 }
 
-app.get('/movies', handleGetMovies)
+app.use(function validateBearerToken(req, res, next) {
+    console.log('validate bearer token middleware')
+    debugger
+    //move to next middleware
+    next()
+})
 
-function handleGetMovieGetMovies(req, res) {
+function handleGetMovies(req, res) {
     res.send('Hello, Movies!')
 }
 
-app.get('movies', handleGetMovies)
+app.get('/movies', (req, res)=> {
+    const {search = " ", sort} = req.query;
+
+    if(sort){
+        if(!['filmtv_ID', 'film_title', 'year', 'genre', 'duration', 'country', 'director', 'actors', 'avg_vote', 'votes'].includes(sort)){
+            return res.status(400)
+            .send('Sort must be one of the title or ID');
+        }
+    }
+
+    let results = movies
+    .filter(movie =>
+        movie
+            .film_title
+            .toLowerCase()
+            .includes(search.toLowerCase()));
+
+            if(sort){
+                results.sort((a, b) => {
+                    return a[sort] > v[sort] ? 1 : a[sort] < b[sort] ? -1 :0;
+                })
+            }
+
+            res.json(results);
+})
 
 const PORT = 8000
 
